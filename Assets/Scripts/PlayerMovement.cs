@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,6 +8,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float xClampRange = 10f;
     [SerializeField] private float yClampRange = 10f;
 
+    [SerializeField] private float controlRollFactor = 20f;
+    [SerializeField] private float controlPitchFactor = 20f;
+    [SerializeField] private float rotationSpeed = 10f;
+
     Vector2 movement;
 
     
@@ -14,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         ProcessTranslation();
+        ProcessRotation();
     }
 
 
@@ -33,5 +39,13 @@ public class PlayerMovement : MonoBehaviour
         float clampedYPos = Mathf.Clamp(rawYpos, -yClampRange, yClampRange);
 
         transform.localPosition = new Vector3(clampedXPos, clampedYPos, 0f);
+    }
+    private void ProcessRotation()
+    {
+        float pitch = -controlPitchFactor * movement.y;
+        float roll = -controlRollFactor * movement.x;
+
+        Quaternion targetRotation = Quaternion.Euler(pitch, 0f, roll);
+        transform.localRotation = Quaternion.Lerp(transform.localRotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 }
